@@ -155,8 +155,8 @@ class DVB_ForEachCheckpoint:
     ICON = "🗘"
     OUTPUT_NODE = True
     CATEGORY = NodeCategories.UTILS
-    RETURN_TYPES = tuple()
-    RETURN_NAMES = tuple()
+    RETURN_TYPES = ("BOOLEAN", )
+    RETURN_NAMES = ("finished", )
     FUNCTION = "exec"
 
     @classmethod
@@ -176,8 +176,38 @@ class DVB_ForEachCheckpoint:
         state = ForEachState(foreach)
         next_file = state.pop()
         state.mark_done(next_file)
-        return tuple()
+        if state.pop() is None:
+            return (True, )
+        return (False, )
 
+class DVB_ForEachCheckpointBool:
+    NODE_NAME = "For Each Done (Bool)"
+    ICON = "🗘"
+    OUTPUT_NODE = True
+    CATEGORY = NodeCategories.UTILS
+    RETURN_TYPES = ()
+    RETURN_NAMES = ()
+    FUNCTION = "exec"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "finished": ("BOOLEAN",),
+                "foreach": ("FOREACH",),
+            }
+        }
+
+    @classmethod
+    def IS_CHANGED(cls, *values):
+        return ALWAYS_CHANGED_FLAG
+
+    def exec(self, finished, foreach):
+        state = ForEachState(foreach)
+        if finished == True:
+            next_file = state.pop()
+            state.mark_done(next_file)
+        return tuple()
 
 class DVB_StringTokenizer:
     NODE_NAME = "String Tokenizer"
